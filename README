@@ -1,0 +1,40 @@
+By Wenzhe jiang (wj3) & Jun Liu (jl84)
+
+Description of submitted source files:
+
+1. yalnix.c: This is the main file of the kernel. It includes the kernelStart function,
+SetKernelBrk function, and all trap handlers.
+
+2. kernelcall.c: This file is the implementation of all kernel calls.
+
+3. load.c: This file is specifically for loading a specified program into memory.
+
+4. utilities.c: This file includes all self-defined functions in order to help yalnix.c, 
+kernelcall.c, and load.c.
+
+5. kernel.h: This is the headfile for all source c files.
+
+6. README: A description of the whole project.
+
+7. other test files
+
+Design and algorithm highlights:
+
+1. Page table: In order to efficiently utilize the memory, we write a separate function
+for page table allocation. Every time we need a page table, we separately get a free page
+from the free page list. If one page is only half occupied (with one page table), we 
+remember it and use the other half for next time use. In this way, we guarantee there will
+be at most half page of unused memory at any time.
+
+2. Fork implementation: In fork function, we need to copy the r0 region from one process
+to another. A straightforward way is to first copy it to r1, then switch page table and 
+copy from r1 back to new r0 region. This method requires 2 times memory of one process.
+In order to avoid this, we borrow a PTE from the guaranteed unused region in r0 region 
+(in our implementation, we use the page start from USER_STACK_LIMIT) to map to
+the physical address of new r0 region. Then we copy the contents page by page and 
+invalidate the borrowed PTE afterwards.
+
+Testing:
+
+We thoroughly tested our kernel using all given samples in the pub/samples-lab2 folder on
+clear without any problem.   
